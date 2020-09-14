@@ -44,9 +44,7 @@ class _NotusHtmlEncoder extends Converter<Delta, String> {
         buffer.write(currentBlockLines.join('\n\n'));
         buffer.writeln();
       } else if (blockStyle == NotusAttribute.latex) {
-        _writeAttribute(buffer, blockStyle);
-        buffer.write(currentBlockLines.join('\n'));
-        _writeAttribute(buffer, blockStyle, close: true);
+        _writeAttribute(buffer, blockStyle, value: currentBlockLines.first);
         buffer.writeln();
       } else if (blockStyle == NotusAttribute.expandable) {
         _writeAttribute(buffer, blockStyle);
@@ -198,7 +196,7 @@ class _NotusHtmlEncoder extends Converter<Delta, String> {
   }
 
   void _writeAttribute(StringBuffer buffer, NotusAttribute attribute,
-      {bool close = false}) {
+      {bool close = false, String value}) {
     if (attribute == NotusAttribute.bold) {
       _writeBoldTag(buffer, close: close);
     } else if (attribute == NotusAttribute.italic) {
@@ -207,6 +205,9 @@ class _NotusHtmlEncoder extends Converter<Delta, String> {
       _writeLinkTag(buffer, attribute as NotusAttribute<String>, close: close);
     } else if (attribute.key == NotusAttribute.heading.key) {
       _writeHeadingTag(buffer, attribute as NotusAttribute<int>, close: close);
+    } else if (attribute.key == NotusAttribute.block.key &&
+        attribute == NotusAttribute.latex) {
+      _writeLatexTag(buffer, value: value);
     } else if (attribute.key == NotusAttribute.block.key) {
       _writeBlockTag(buffer, attribute as NotusAttribute<String>, close: close);
     } else if (attribute.key == NotusAttribute.embed.key) {
@@ -239,6 +240,11 @@ class _NotusHtmlEncoder extends Converter<Delta, String> {
     buffer.write(!close ? "<h$level>" : "</h$level>");
   }
 
+  void _writeLatexTag(StringBuffer buffer, {String value}) {
+    buffer.write(
+        '<img src="https://chart.apis.google.com/chart?cht=tx&chl={${value}}">');
+  }
+
   void _writeBlockTag(StringBuffer buffer, NotusAttribute<String> block,
       {bool close = false}) {
     if (block == NotusAttribute.code) {
@@ -252,12 +258,6 @@ class _NotusHtmlEncoder extends Converter<Delta, String> {
         buffer.write('\n<details open><summary><strong>');
       } else {
         buffer.write('</details>\n');
-      }
-    } else if (block == NotusAttribute.latex) {
-      if (!close) {
-        buffer.write('\n<var>');
-      } else {
-        buffer.write('</var>\n');
       }
     } else {
       if (!close) {
