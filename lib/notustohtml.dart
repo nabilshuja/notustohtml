@@ -43,6 +43,22 @@ class _NotusHtmlEncoder extends Converter<Delta, String> {
       if (blockStyle == null) {
         buffer.write(currentBlockLines.join('\n\n'));
         buffer.writeln();
+      } else if (blockStyle == NotusAttribute.latex) {
+        _writeAttribute(buffer, blockStyle);
+        buffer.write(currentBlockLines.join('\n'));
+        _writeAttribute(buffer, blockStyle, close: true);
+        buffer.writeln();
+      } else if (blockStyle == NotusAttribute.expandable) {
+        _writeAttribute(buffer, blockStyle);
+        buffer.write(currentBlockLines.first);
+        buffer.write('</strong></summary>');
+        var blockLines = List.from(currentBlockLines);
+        blockLines.removeAt(0);
+        buffer.write('<ul>');
+        buffer.write(blockLines.join("\n"));
+        buffer.write('</ul>');
+        _writeAttribute(buffer, blockStyle, close: true);
+        buffer.writeln();
       } else if (blockStyle == NotusAttribute.code) {
         _writeAttribute(buffer, blockStyle);
         buffer.write(currentBlockLines.join('\n'));
@@ -230,6 +246,18 @@ class _NotusHtmlEncoder extends Converter<Delta, String> {
         buffer.write('\n<code>');
       } else {
         buffer.write('</code>\n');
+      }
+    } else if (block == NotusAttribute.expandable) {
+      if (!close) {
+        buffer.write('\n<details open><summary><strong>');
+      } else {
+        buffer.write('</details>\n');
+      }
+    } else if (block == NotusAttribute.latex) {
+      if (!close) {
+        buffer.write('\n<var>');
+      } else {
+        buffer.write('</var>\n');
       }
     } else {
       if (!close) {
