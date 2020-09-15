@@ -242,7 +242,7 @@ class _NotusHtmlEncoder extends Converter<Delta, String> {
 
   void _writeLatexTag(StringBuffer buffer, {String value}) {
     buffer.write(
-        '<img src="https://chart.apis.google.com/chart?cht=tx&chl={${value}}">');
+        '<img src="https://chart.apis.google.com/chart?cht=tx&chl={${Uri.encodeComponent(value)}}">');
   }
 
   void _writeBlockTag(StringBuffer buffer, NotusAttribute<String> block,
