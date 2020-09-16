@@ -274,7 +274,7 @@ class _NotusHtmlEncoder extends Converter<Delta, String> {
     if (embed.type == EmbedType.horizontalRule) {
       buffer.write("<hr>");
     } else if (embed.type == EmbedType.image) {
-      buffer.write('<img src="${embed.value["source"]}">');
+      buffer.write('<img width="100%" src="${embed.value["source"]}">');
     }
   }
 }
